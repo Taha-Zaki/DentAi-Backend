@@ -1,0 +1,23 @@
+[
+  {
+    "name": "علی",
+    "treatment": "تعویض سیم یا تحویل قالب ",
+    "start_time": "14:40",
+    "end_time": "14:50",
+    "duration_minutes": 10.89
+  },
+  {
+    "name": "رضا",
+    "treatment": "تعویض سیم یا تحویل قالب ",
+    "start_time": "14:50",
+    "end_time": "15:01",
+    "duration_minutes": 10.89
+  },
+  {
+    "name": "محمد",
+    "treatment": "شروع",
+    "start_time": "15:01",
+    "end_time": "15:24",
+    "duration_minutes": 23.07
+  }
+]

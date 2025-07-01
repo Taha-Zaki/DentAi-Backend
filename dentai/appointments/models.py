@@ -1,19 +1,26 @@
+
+# appointments/models.py
+
 from django.db import models
 from accounts.models import Patient
-class Appointment(models.Model):
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-    date = models.DateField()
-    start_time = models.TimeField()
-    predicted_duration = models.IntegerField(help_text="in minutes")
-    actual_duration = models.IntegerField(blank=True, null=True)
-    treatment_type = models.CharField(max_length=255)
 
+class Appointment(models.Model):
     STATUS_CHOICES = [
-        ("scheduled", "Scheduled"),
-        ("waiting", "Waiting"),
-        ("in_progress", "In Progress"),
-        ("completed", "Completed"),
-        ("cancelled", "Cancelled"),
-        ("absent", "Absent"),
+        ('waiting', 'در انتظار'),
+        ('in_progress', 'در حال درمان'),
+        ('completed', 'تکمیل شده'),
+        ('cancelled', 'لغو شده'),
+        ('absent', 'عدم حضور'),
     ]
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="scheduled")
+
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    treatment_type = models.CharField(max_length=100)
+    predicted_start_time = models.TimeField()
+    predicted_duration = models.IntegerField()  # به دقیقه
+    actual_start_time = models.TimeField(null=True, blank=True)
+    actual_duration = models.IntegerField(null=True, blank=True)  # دقیقه
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
+    date = models.DateField()
+
+    def __str__(self):
+        return f"{self.patient} - {self.treatment_type} ({self.status})"

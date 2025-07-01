@@ -1,0 +1,179 @@
+# نسخه اولیه ) Api ( طراحی شده برای پروژه
+### 1. دریافت جدول لایو نوبتها برای نمایش عمومی
+**GET** `/api/live-appointments/`
+- بدون ورود ی
+- خروجی :
+```json
+[
+{
+"patient_name": "علی رضایی ",
+"treatment_type": "تحویل قالب ",
+"predicted_start_time": "14:30",
+"remaining_minutes": 20,
+"status": "waiting" // waiting | in_progress | completed
+},
+...
+]
+```
+---
+### 2. ورود منشی با رمز عبور
+**POST** `/api/auth/login-staff/`
+- ورودی :
+```json
+{
+"username": "admin",
+"password": "admin123"
+}
+```
+- خروجی :
+```json
+{
+"token": "JWT_TOKEN_HERE",
+"role": "receptionist"
+}
+```
+---
+### 3. ورود بیمار با تلفن همراه و OTP
+**POST** `/api/auth/request-otp/`
+```json
+{
+"phone_number": "09121234567"
+}
+```
+**POST** `/api/auth/verify-otp/`
+```json
+{
+"phone_number": "09121234567",
+"code": "9836"
+}
+```
+خروجی هر دو مرحله شامل توکن JWT خواهد بود .
+---
+### 4. ثبت نوبتهای یک روز توسط منشی (Batch Add Appointments)
+**POST** `/api/appointments/batch-add/`
+- ورودی :
+```json
+{
+"date": "2025-07-01",
+"start_time": "13:30",
+"appointments": [
+{"patient_id": 1, "treatment_type": "تحویل قالب "},
+{"patient_id": 2, "treatment_type": "تعویض سیم "},
+{"patient_id": 3, "treatment_type": "تنظیم براکت "}
+]
+}
+```
+- خروجی :
+```json
+{
+"status": "generated",
+"scheduled": [
+{"patient_name": "زهرا قاسمی ", "predicted_time": "13:30"},
+...
+]
+}
+```
+---
+### 5. دریافت نوبتهای یک روز خاص )تقویم(
+**GET** `/api/appointments/calendar/?date=2025-07-01`
+- خروجی :
+```json
+[
+{
+"patient_name": "زهرا قاسمی ",
+"treatment_type": "چسباندن براکت ",
+"status": "scheduled"
+}, ...
+]
+```
+---
+### 6. وضعیت نوبتها - کنترل توسط منشی )حضور، عدم حضور، پایان درمان، افزودن زمان(
+**PATCH** `/api/appointments/{id}/update-status/`
+- ورودی :
+```json
+{
+"status": "in_progress" // completed | cancelled | absent
+}
+```
+**PATCH** `/api/appointments/{id}/add-time/`
+```json
+{
+"extra_minutes": 10
+}
+```
+---
+### دریافت پروفایل بیمار برای داشبورد منشی یا بیمار . 7
+**GET and POST** `/api/patients/{id}/profile/`
+```json
+{
+"full_name": " زهرا قاسم ی ",
+"birth_date": "2004-03-15",
+"allergies": " پن یسیلین ",
+"diseases": "دیابت ",
+...
+}
+```
+---
+### 8. سوابق درمان بیمار
+**GET** `/api/patients/{id}/treatments/`
+```json
+[
+{
+"date": "2025-06-01",
+"treatment_type": "تنظیم براکت ",
+"status": "completed",
+"notes": "درمان انجام شد .",
+"link_to_payment": "/api/payments/12/"
+}, ...
+]
+```
+---
+### 9. پرداختیها )نمایش + ثبت(
+**GET** `/api/patients/{id}/payments/`
+```json
+[
+{
+"id": 1,
+"treatment_type": "نصب سیم ",
+"total": 2000000,
+"paid": 500000,
+"status": "partial",
+"method": "pos",
+"tracking_code": "87463"
+}
+]
+```
+**POST** `/api/payments/`
+```json
+{
+"patient_id": 5,
+"treatment_type": "تعویض سیم ",
+"total": 1000000,
+"paid": 300000,
+"method": "cash",
+"tracking_code": "XKD745"
+}
+```
+---
+### 10. آپلود فایل پزشکی (PDF, عکس, رادیوگرافی )
+**POST** `/api/files/`
+`multipart/form-data`
+```
+file: [File]
+patient_id: 5
+file_type: xray | pdf | image
+```
+---
+### 11. نکات آموزشی برای بیماران
+**GET** `/api/education/`
+```json
+[
+{
+"title": " مراقبت از براک ت ",
+"file_type": "video",
+"file_url": "https://www.aparat.com/v/XXXX"
+}
+]
+```
+---
+🔒 تمام endpoint های بالا با توکن JWT امنسازی خواهند ش د به جز صفحه لندینگ و درخواس ت otp
