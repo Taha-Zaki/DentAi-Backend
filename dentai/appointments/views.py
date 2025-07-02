@@ -100,6 +100,22 @@ class AppointmentStatusUpdateView(APIView):
         # ثبت actual_start_time در زمان شروع واقعی
         if new_status == "in_progress" and appointment.actual_start_time is None:
             appointment.actual_start_time = now().time()
+            predicted_dt = datetime.combine(appointment.date, appointment.predicted_start_time)
+            actual_dt = datetime.combine(appointment.date, appointment.actual_start_time)
+            delay_minutes = int((actual_dt - predicted_dt).total_seconds() / 60)
+
+            if delay_minutes > 0:
+                later_appointments = Appointment.objects.filter(
+                    date=appointment.date,
+                    predicted_start_time__gt=appointment.predicted_start_time
+                ).order_by('predicted_start_time')
+
+                for a in later_appointments:
+                    dt = datetime.combine(appointment.date, a.predicted_start_time)
+                    dt += timedelta(minutes=delay_minutes)
+                    a.predicted_start_time = dt.time()
+                    a.save()
+
 
         # ثبت actual_duration در زمان پایان درمان
         if new_status == "completed" and appointment.actual_start_time:
@@ -138,4 +154,17 @@ class AppointmentAddTimeView(APIView):
         extra = int(request.data.get("extra_minutes", 0))
         appointment.predicted_duration += extra
         appointment.save()
+        
+        # نوبت‌های بعدی رو shift بده
+        later_appointments = Appointment.objects.filter(
+            date=appointment.date,
+            predicted_start_time__gt=appointment.predicted_start_time
+        ).order_by('predicted_start_time')
+
+        for a in later_appointments:
+            dt = datetime.combine(appointment.date, a.predicted_start_time)
+            dt += timedelta(minutes=extra)
+            a.predicted_start_time = dt.time()
+            a.save()
+
         return Response({"status": "extra_time_added"}, status=http_status.HTTP_200_OK)
