@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# education/views.py
 from rest_framework import viewsets
 from .models import EducationItem
 from .serializers import EducationItemSerializer
