@@ -21,6 +21,7 @@ class Appointment(models.Model):
     actual_duration = models.IntegerField(null=True, blank=True)  # دقیقه
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='waiting')
     date = models.DateField()
+    doctor_note = models.TextField(blank=True, null=True)  # یادداشت پزشک
 
     def __str__(self):
         return f"{self.patient} - {self.treatment_type} ({self.status})"

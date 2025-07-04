@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import TreatmentRecord
+from .models import Treatment
 
-admin.site.register(TreatmentRecord)
+admin.site.register(Treatment)

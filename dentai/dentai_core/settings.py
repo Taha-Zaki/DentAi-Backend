@@ -26,6 +26,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+        'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ]
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -47,9 +50,10 @@ INSTALLED_APPS = [
     'accounts',
     'appointments',
     'treatments',
-    'payments',
     'medicalfiles',
     'education',
+    'payments.apps.PaymentsConfig',
+
 ]
 
 MIDDLEWARE = [
