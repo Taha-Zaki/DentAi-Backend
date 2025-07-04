@@ -1,10 +1,14 @@
-from rest_framework import serializers
-from .models import TreatmentRecord
+# treatments/serializers.py
 
-class TreatmentRecordSerializer(serializers.ModelSerializer):
-    appointment_id = serializers.CharField(source='appointment.id', read_only=True)
-    created_at = serializers.DateTimeField(format="%Y-%m-%d %H:%M:%S", read_only=True)
+from rest_framework import serializers
+from .models import Treatment
+
+class TreatmentSerializer(serializers.ModelSerializer):
+    patient_name = serializers.SerializerMethodField()
 
     class Meta:
-        model = TreatmentRecord
-        fields = ['id', 'appointment_id', 'notes', 'created_at']
+        model = Treatment
+        fields = ['id', 'appointment', 'patient_name', 'treatment_type', 'status', 'date', 'doctor_note']
+
+    def get_patient_name(self, obj):
+        return obj.appointment.patient.user.get_full_name()

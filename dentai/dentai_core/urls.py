@@ -26,6 +26,9 @@ urlpatterns = [
     path('api/', include('appointments.urls')),     # شامل URLهای اپلیکیشن نوبت‌دهی
     path('api/accounts/', include('accounts.urls')),
     path('api/education/', include('education.urls')),
+    path('api/treatments/', include('treatments.urls')),
+    path('api/payments/', include('payments.urls')),
+    path('api/medical/', include('medicalfiles.urls')),
 
 ]
 

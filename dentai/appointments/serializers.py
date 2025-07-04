@@ -12,7 +12,7 @@ class AppointmentSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Appointment
-        fields = ['id', 'patient', 'patient_name', 'treatment_type', 'predicted_start_time', 'predicted_duration', 'actual_start_time', 'actual_duration', 'status', 'date']
+        fields = ['id', 'patient', 'patient_name', 'treatment_type', 'predicted_start_time', 'predicted_duration', 'actual_start_time', 'actual_duration', 'status', 'date', 'doctor_note']
 
 
 
@@ -34,7 +34,7 @@ class AppointmentOutputSerializer(serializers.ModelSerializer):
             "id", "patient", "patient_name", "treatment_type",
             "predicted_start_time", "predicted_duration",
             "actual_start_time", "actual_duration",
-            "status", "date"
+            "status", "date", 'doctor_note'
         ]
 
     def get_patient_name(self, obj):

@@ -1,6 +1,14 @@
+# treatments/models.py
+
 from django.db import models
 from appointments.models import Appointment
-class TreatmentRecord(models.Model):
-    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE)
-    notes = models.TextField(blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+
+class Treatment(models.Model):
+    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name='treatment')
+    treatment_type = models.CharField(max_length=100)
+    status = models.CharField(max_length=20)
+    date = models.DateField()
+    doctor_note = models.TextField(blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.appointment.patient.user.get_full_name()} - {self.treatment_type} - {self.date}"
