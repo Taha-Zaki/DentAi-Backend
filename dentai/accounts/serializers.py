@@ -13,55 +13,69 @@ class PatientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
         fields = [
-            'id',
-            'user',
-            'birth_date',
-            'father_name',
-            'place_of_birth',
-            'gender',
-            'marital_status',
-            'education',
-            'occupation',
-            'address',
-            'phone',
-            'landline',
-            'reason_for_visit',
-            'under_doctor_observation',
-            'doctor_observation_reason',
-            'has_heart_disease',
-            'has_diabetes',
-            'has_lung_disease',
-            'has_respiratory_disease',
-            'has_allergy',
-            'has_autoimmune_disease',
-            'has_kidney_disease',
-            'has_bleeding_disorder',
-            'has_hepatitis',
-            'is_smoker',
-            'has_epilepsy',
-            'has_history_of_hospitalization',
-            'disease_description',
-            'is_pregnant',
-            'is_in_menstrual_cycle',
-            'weeks_of_pregnancy'
+            "id",
+            "user",
+            "birth_date",
+            "gender",
+            "occupation",
+            "landline",
+            "phone",
+            "address",
+            "relative_job",
+            "record_completion_date",
+            "record_number",
+
+            # بیماری‌ها
+            "has_diabetes",
+            "has_heart_disease",
+            "has_tonsil_issue",
+            "has_blood_disease",
+            "has_allergy",
+            "has_lung_disease",
+            "has_history_of_hospitalization",
+            "other_diseases",
+
+            "current_medications",
+            "relationship_with_patient",
+
+            # رضایت
+            "treatment_consent",
+            "consent_date",
+
+            # کلینیکال
+            "problem_list",
+            "treatment_plan",
+            "retention_plan",
+            "system_used",
+            "crowding",
+            "protrusion_lips",
+            "molars",
+            "bite",
+            "midline",
+            "gingival_show",
+            "shift",
+            "dual_bite",
         ]
+
+    # ‼️ اگر هنوز نیاز داری از متد create / update سفارشی استفاده شود:
     def create(self, validated_data):
-        user_data = validated_data.pop('user')
+        user_data = validated_data.pop("user")
         user = User.objects.create_user(**user_data, is_patient=True)
-        patient = Patient.objects.create(user=user, **validated_data)
-        return patient
+        return Patient.objects.create(user=user, **validated_data)
 
     def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', None)
+        user_data = validated_data.pop("user", None)
         if user_data:
-            for attr, value in user_data.items():
-                setattr(instance.user, attr, value)
+            for attr, val in user_data.items():
+                setattr(instance.user, attr, val)
             instance.user.save()
-        for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-        instance.save()
-        return instance 
 
+        for attr, val in validated_data.items():
+            setattr(instance, attr, val)
+        instance.save()
+        return instance
+    
+    
 class PatientSearchSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
 
