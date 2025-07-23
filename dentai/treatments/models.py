@@ -4,7 +4,7 @@ from django.db import models
 from appointments.models import Appointment
 
 class Treatment(models.Model):
-    appointment = models.OneToOneField(Appointment, on_delete=models.CASCADE, related_name='treatment')
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='treatment')
     treatment_type = models.CharField(max_length=100)
     status = models.CharField(max_length=20)
     date = models.DateField()

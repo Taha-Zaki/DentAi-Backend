@@ -6,11 +6,30 @@ from appointments.models import Appointment
 from .models import Treatment
 
 @receiver(post_save, sender=Appointment)
-def create_treatment_for_appointment(sender, instance, created, **kwargs):
+def sync_treatment_with_appointment(sender, instance, created, **kwargs):
     if created:
         Treatment.objects.create(
             appointment=instance,
             treatment_type=instance.treatment_type,
             date=instance.date,
-            status=instance.status
+            status=instance.status,
+            doctor_note=instance.doctor_note
         )
+    else:
+        # بروزرسانی Treatment موجود
+        try:
+            treatment = Treatment.objects.get(appointment=instance)
+            treatment.treatment_type = instance.treatment_type
+            treatment.date = instance.date
+            treatment.status = instance.status
+            treatment.doctor_note = instance.doctor_note
+            treatment.save()
+        except Treatment.DoesNotExist:
+            # اگر به دلایلی treatment نبوده، ایجاد کن
+            Treatment.objects.create(
+                appointment=instance,
+                treatment_type=instance.treatment_type,
+                date=instance.date,
+                status=instance.status,
+                doctor_note=instance.doctor_note
+            )

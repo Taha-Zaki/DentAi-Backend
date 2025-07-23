@@ -36,7 +36,7 @@ REST_FRAMEWORK = {
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.212.25','127.0.0.1']
 
 
 # Application definition
@@ -94,8 +94,12 @@ WSGI_APPLICATION = 'dentai_core.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'dentai_db',
+        'USER': 'dentai_user',
+        'PASSWORD': '456',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 

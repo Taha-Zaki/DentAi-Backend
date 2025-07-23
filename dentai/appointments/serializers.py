@@ -44,3 +44,7 @@ class AppointmentOutputSerializer(serializers.ModelSerializer):
         class Meta:
             model = Appointment
             fields = ['status']
+class AppointmentDoctorNoteUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['doctor_note']

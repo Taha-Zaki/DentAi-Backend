@@ -1,0 +1,431 @@
+[
+  {
+    "model": "sessions.session",
+    "pk": "4cjoclrj8udvpmtj72algpu22f2dwacv",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln24g9Q0ucM1q7XiwPIkeKkQtwdIqWA9s3Me6mE61LT2sucRlYXZdXhdyPMj9I2wHdst0nnqS3zSHpT9E67HiYuz-vu_h1U7PVbC0dAMtYIGPKZsjgUIPSBC7oTU_SZjxApgmdxAhgAUaxzLpI5B_X-ABa6ONM:1uVlwF:D1BuJIzyc_BgSYnX8Wg2PtmLr-A2G_hS8ZycVnLhdUM",
+      "expire_date": "2025-07-13T06:54:55.632"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "8f8fhmh2izj0hpw9kpxj1zt7acuh3c5k",
+    "fields": {
+      "session_data": ".eJxVjDsOwjAQBe_iGln24g9Q0ucM1q7XiwPIkeKkQtwdIqWA9s3Me6mE61LT2sucRlYXZdXhdyPMj9I2wHdst0nnqS3zSHpT9E67HiYuz-vu_h1U7PVbC0dAMtYIGPKZsjgUIPSBC7oTU_SZjxApgmdxAhgAUaxzLpI5B_X-ABa6ONM:1ub0vn:T6qeyDTMvbNsIUyH1o07zu5wKB_DjfR-IjZyJEVMQjc",
+      "expire_date": "2025-07-27T21:26:07.798"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "m746eccp193ieciwhufwmvzdpd8zfddq",
+    "fields": {
+      "session_data": "eyJvdHAiOiIxMjM0IiwicGhvbmUiOiIwOTE5NjI2ODQ1NSJ9:1uVmNj:Oxy7Ppx267lCg9bJwq5ftguZAvrICnUgzH9IWBfW0aw",
+      "expire_date": "2025-07-13T07:23:19.523"
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$1000000$7WdIcGTSeL9z9UCZaqDVDI$41hUrtburXoOGny+G3EBEklVPV41Ah1o6XwPBAHA7mg=",
+      "last_login": "2025-07-13T21:26:07.792",
+      "is_superuser": true,
+      "username": "Drmousavi",
+      "first_name": "",
+      "last_name": "",
+      "email": "Drmousavi@gmail.com",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2025-06-29T06:54:12",
+      "is_patient": false,
+      "is_receptionist": true,
+      "phone_number": "09123456789",
+      "national_id": "987654321",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 2,
+    "fields": {
+      "password": "123",
+      "last_login": "2025-06-29T07:02:47",
+      "is_superuser": false,
+      "username": "taha",
+      "first_name": "taha",
+      "last_name": "zaki",
+      "email": "taha@gmail.com",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-06-29T07:02:39",
+      "is_patient": true,
+      "is_receptionist": false,
+      "phone_number": "09196268455",
+      "national_id": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 3,
+    "fields": {
+      "password": "789",
+      "last_login": "2025-06-29T08:14:59",
+      "is_superuser": false,
+      "username": "ali",
+      "first_name": "ali",
+      "last_name": "jafari",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-06-29T08:14:51",
+      "is_patient": false,
+      "is_receptionist": false,
+      "phone_number": "0999999999",
+      "national_id": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.user",
+    "pk": 4,
+    "fields": {
+      "password": "!W9rU6oOL0q4kMdertXvhQs3Yk5tiXz2u78KzQXWs",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "mom",
+      "first_name": "vahide",
+      "last_name": "jafari",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2025-06-29T08:31:32",
+      "is_patient": true,
+      "is_receptionist": false,
+      "phone_number": "09195273694",
+      "national_id": null,
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "accounts.patient",
+    "pk": 1,
+    "fields": {
+      "user": 2,
+      "birth_date": "2025-06-29",
+      "gender": "male",
+      "occupation": "programmer",
+      "phone": "09196268455",
+      "landline": "32537595",
+      "address": "iran , karaj , home",
+      "relative_job": "vahab",
+      "record_completion_date": null,
+      "record_number": "",
+      "has_diabetes": true,
+      "has_heart_disease": true,
+      "has_tonsil_issue": true,
+      "has_blood_disease": true,
+      "has_allergy": true,
+      "has_lung_disease": false,
+      "has_history_of_hospitalization": true,
+      "other_diseases": "headache",
+      "current_medications": "for having problem in pooping",
+      "relationship_with_patient": "computer",
+      "treatment_consent": false,
+      "consent_date": null,
+      "problem_list": "the doctor is very good",
+      "treatment_plan": "",
+      "retention_plan": "",
+      "system_used": "karaj",
+      "crowding": "",
+      "protrusion_lips": "",
+      "molars": "",
+      "bite": "",
+      "midline": "",
+      "gingival_show": "",
+      "shift": "",
+      "dual_bite": ""
+    }
+  },
+  {
+    "model": "accounts.patient",
+    "pk": 2,
+    "fields": {
+      "user": 3,
+      "birth_date": "2025-06-29",
+      "gender": "male",
+      "occupation": "trainist",
+      "phone": "09106547987",
+      "landline": "32156478",
+      "address": "tehran , iran , home",
+      "relative_job": "asad",
+      "record_completion_date": null,
+      "record_number": "",
+      "has_diabetes": false,
+      "has_heart_disease": false,
+      "has_tonsil_issue": false,
+      "has_blood_disease": false,
+      "has_allergy": false,
+      "has_lung_disease": false,
+      "has_history_of_hospitalization": true,
+      "other_diseases": "",
+      "current_medications": "",
+      "relationship_with_patient": "train",
+      "treatment_consent": true,
+      "consent_date": null,
+      "problem_list": "",
+      "treatment_plan": "",
+      "retention_plan": "",
+      "system_used": "tehron",
+      "crowding": "",
+      "protrusion_lips": "",
+      "molars": "",
+      "bite": "",
+      "midline": "",
+      "gingival_show": "",
+      "shift": "",
+      "dual_bite": ""
+    }
+  },
+  {
+    "model": "accounts.patient",
+    "pk": 3,
+    "fields": {
+      "user": 4,
+      "birth_date": "2025-06-29",
+      "gender": "female",
+      "occupation": "programmer",
+      "phone": "09195273694",
+      "landline": "32537595",
+      "address": "iran , karaj , home",
+      "relative_job": "asad",
+      "record_completion_date": null,
+      "record_number": "",
+      "has_diabetes": true,
+      "has_heart_disease": true,
+      "has_tonsil_issue": true,
+      "has_blood_disease": true,
+      "has_allergy": true,
+      "has_lung_disease": false,
+      "has_history_of_hospitalization": true,
+      "other_diseases": "headache",
+      "current_medications": "for having problem in pooping",
+      "relationship_with_patient": "computer",
+      "treatment_consent": false,
+      "consent_date": null,
+      "problem_list": "the doctor is very good",
+      "treatment_plan": "",
+      "retention_plan": "",
+      "system_used": "karaj",
+      "crowding": "",
+      "protrusion_lips": "",
+      "molars": "",
+      "bite": "",
+      "midline": "",
+      "gingival_show": "",
+      "shift": "",
+      "dual_bite": ""
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 23,
+    "fields": {
+      "patient": 2,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "predicted_start_time": "08:42:00",
+      "predicted_duration": 34,
+      "actual_start_time": "08:46:30.851",
+      "actual_duration": 36,
+      "status": "completed",
+      "date": "2025-07-02",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 24,
+    "fields": {
+      "patient": 3,
+      "treatment_type": "تعویض سیم یا تحویل قالب",
+      "predicted_start_time": "09:22:54",
+      "predicted_duration": 10,
+      "actual_start_time": null,
+      "actual_duration": null,
+      "status": "waiting",
+      "date": "2025-07-02",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 25,
+    "fields": {
+      "patient": 1,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "predicted_start_time": "08:42:00",
+      "predicted_duration": 14,
+      "actual_start_time": null,
+      "actual_duration": null,
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 26,
+    "fields": {
+      "patient": 3,
+      "treatment_type": "تعویض سیم یا تحویل قالب",
+      "predicted_start_time": "08:56:54",
+      "predicted_duration": 10,
+      "actual_start_time": null,
+      "actual_duration": null,
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 27,
+    "fields": {
+      "patient": 1,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "predicted_start_time": "08:42:00",
+      "predicted_duration": 14,
+      "actual_start_time": null,
+      "actual_duration": null,
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 28,
+    "fields": {
+      "patient": 2,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "predicted_start_time": "08:42:00",
+      "predicted_duration": 14,
+      "actual_start_time": null,
+      "actual_duration": null,
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "appointments.appointment",
+    "pk": 29,
+    "fields": {
+      "patient": 1,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "predicted_start_time": "08:42:00",
+      "predicted_duration": 14,
+      "actual_start_time": null,
+      "actual_duration": null,
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "treatments.treatment",
+    "pk": 1,
+    "fields": {
+      "appointment": 25,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "treatments.treatment",
+    "pk": 2,
+    "fields": {
+      "appointment": 26,
+      "treatment_type": "تعویض سیم یا تحویل قالب",
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "treatments.treatment",
+    "pk": 3,
+    "fields": {
+      "appointment": 27,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "treatments.treatment",
+    "pk": 4,
+    "fields": {
+      "appointment": 28,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "treatments.treatment",
+    "pk": 5,
+    "fields": {
+      "appointment": 29,
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "status": "waiting",
+      "date": "2025-07-04",
+      "doctor_note": null
+    }
+  },
+  {
+    "model": "medicalfiles.medicalfile",
+    "pk": 1,
+    "fields": {
+      "patient": 1,
+      "file_type": "image",
+      "file": "",
+      "url": null,
+      "description": null,
+      "created_at": "2025-07-04T08:07:28.473"
+    }
+  },
+  {
+    "model": "education.educationitem",
+    "pk": 3,
+    "fields": {
+      "title": "dentcare_pdf",
+      "file_type": "pdf",
+      "file": "education_pdfs/dentcare_TaO4OwT.pdf",
+      "url": null,
+      "created_at": "2025-07-02T17:05:20.377"
+    }
+  },
+  {
+    "model": "payments.payment",
+    "pk": 1,
+    "fields": {
+      "appointment": 29,
+      "date": "2025-07-04",
+      "treatment_type": "ویزیت معاینه طرح درمان قالب گیری",
+      "total_amount": 600000,
+      "paid_amount": 600000,
+      "is_paid": true,
+      "payment_method": "card",
+      "tracking_code": "ABC123456"
+    }
+  }
+]
