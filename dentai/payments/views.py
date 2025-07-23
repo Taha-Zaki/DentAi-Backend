@@ -1,58 +1,55 @@
-from rest_framework import viewsets, status, filters
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from django_filters.rest_framework import DjangoFilterBackend
+# payments/views.py
+
+from rest_framework import generics
+from rest_framework.views import APIView
 from .models import Payment
 from .serializers import PaymentSerializer
-from appointments.models import Appointment
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-class PaymentViewSet(viewsets.ModelViewSet):
-    queryset = Payment.objects.select_related('appointment__patient__user')
+
+class PaymentDetailView(generics.RetrieveAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]  # یا AllowAny اگر عمومی می‌خوای
+    def get_queryset(self):
+        patient_id = self.kwargs['patient_id']
+        return Payment.objects.filter(appointment__patient_id=patient_id).order_by('payment_number')
+
+    def get_object(self):
+        return self.get_queryset().get(payment_number=self.kwargs['payment_number'])
+
+class PaymentUpdateView(generics.UpdateAPIView):
+    queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [IsAuthenticated]
-    filter_backends = [filters.SearchFilter, DjangoFilterBackend]
+    def get_queryset(self):
+        patient_id = self.kwargs['patient_id']
+        return Payment.objects.filter(appointment__patient_id=patient_id).order_by('payment_number')
 
-    search_fields = [
-        'appointment__patient__user__first_name',
-        'appointment__patient__user__last_name',
-        'appointment__patient__user__username',
-        'appointment__patient__user__phone_number',
-    ]
-    filterset_fields = ['appointment__patient__id']
+    def get_object(self):
+        return self.get_queryset().get(payment_number=self.kwargs['payment_number'])
 
-    def create(self, request, *args, **kwargs):
-        appointment_id = request.data.get('appointment')
-        try:
-            appointment = Appointment.objects.get(id=appointment_id)
-        except Appointment.DoesNotExist:
-            return Response({'error': 'Appointment not found.'}, status=status.HTTP_400_BAD_REQUEST)
+class PaymentsByPatientView(generics.ListAPIView):
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
 
-        # بررسی عدم وجود پرداخت قبلی
-        if hasattr(appointment, 'payment'):
-            return Response({'error': 'Payment already exists for this appointment.'}, status=400)
+    def get_queryset(self):
+        patient_id = self.kwargs['patient_id']
+        return Payment.objects.filter(appointment__patient_id=patient_id).order_by('payment_number')
 
-        payment = Payment.objects.create(
-            appointment=appointment,
-            date=appointment.date,
-            treatment_type=appointment.treatment_type
+
+class LatestPaymentNumber(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, patient_id):
+        latest = (
+            Payment.objects
+            .filter(appointment__patient_id=patient_id)
+            .order_by('-payment_number')
+            .first()
         )
-        serializer = self.get_serializer(payment)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-
-
-    def update(self, request, *args, **kwargs):
-        partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
-        serializer.is_valid(raise_exception=True)
-
-        # ابتدا آپدیت فیلدها
-        self.perform_update(serializer)
-
-        # سپس بررسی تطابق پرداخت کامل
-        instance.refresh_from_db()
-        if instance.total_amount is not None and instance.paid_amount is not None:
-            instance.is_paid = instance.total_amount == instance.paid_amount
-            instance.save()
-
-        return Response(self.get_serializer(instance).data)
+        return Response({
+            "patient_id": patient_id,
+            "latest_payment_number": latest.payment_number if latest else 0
+        })

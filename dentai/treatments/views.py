@@ -7,7 +7,7 @@ from .models import Treatment
 from .serializers import TreatmentSerializer
 
 class TreatmentViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Treatment.objects.select_related('appointment__patient__user').all()
+    queryset = Treatment.objects.select_related('appointment__patient__user').order_by('id')
     serializer_class = TreatmentSerializer
     permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, DjangoFilterBackend]

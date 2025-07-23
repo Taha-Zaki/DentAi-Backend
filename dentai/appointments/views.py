@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Appointment
 from accounts.models import Patient
-from .serializers import BatchAppointmentInputSerializer, AppointmentOutputSerializer, AppointmentSerializer
+from .serializers import BatchAppointmentInputSerializer, AppointmentOutputSerializer, AppointmentSerializer, AppointmentDoctorNoteUpdateSerializer
 from datetime import datetime, timedelta
 import pickle
 from rest_framework import status as http_status
@@ -89,7 +89,6 @@ class BatchAppointmentAddView(APIView):
         })
 
 
-
 class AppointmentStatusUpdateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -97,54 +96,49 @@ class AppointmentStatusUpdateView(APIView):
         appointment = get_object_or_404(Appointment, pk=pk)
         new_status = request.data.get("status")
 
-        # ثبت actual_start_time در زمان شروع واقعی
+        original_status = appointment.status
+        appointment.status = new_status
+
+        # 1. ثبت زمان واقعی شروع درمان
         if new_status == "in_progress" and appointment.actual_start_time is None:
             appointment.actual_start_time = now().time()
             predicted_dt = datetime.combine(appointment.date, appointment.predicted_start_time)
             actual_dt = datetime.combine(appointment.date, appointment.actual_start_time)
             delay_minutes = int((actual_dt - predicted_dt).total_seconds() / 60)
 
-            if delay_minutes > 0:
-                later_appointments = Appointment.objects.filter(
-                    date=appointment.date,
-                    predicted_start_time__gt=appointment.predicted_start_time
-                ).order_by('predicted_start_time')
+            if delay_minutes != 0:
+                self.shift_later_appointments(appointment, delay_minutes)
 
-                for a in later_appointments:
-                    dt = datetime.combine(appointment.date, a.predicted_start_time)
-                    dt += timedelta(minutes=delay_minutes)
-                    a.predicted_start_time = dt.time()
-                    a.save()
-
-
-        # ثبت actual_duration در زمان پایان درمان
+        # 2. ثبت زمان واقعی پایان درمان
         if new_status == "completed" and appointment.actual_start_time:
             start_dt = datetime.combine(appointment.date, appointment.actual_start_time)
             end_dt = datetime.now()
-            appointment.actual_duration = int((end_dt - start_dt).total_seconds() / 60)
+            actual_duration = int((end_dt - start_dt).total_seconds() / 60)
+            appointment.actual_duration = actual_duration
 
-        appointment.status = new_status
+            delay_minutes = actual_duration - appointment.predicted_duration
+            if delay_minutes != 0:
+                self.shift_later_appointments(appointment, delay_minutes)
+
+        # 3. اگر لغو شد یا نیومد → نوبت‌های بعدی جلو بیان
+        if new_status in ["cancelled", "absent"] and original_status == "waiting":
+            self.shift_later_appointments(appointment, -appointment.predicted_duration)
+
         appointment.save()
-
-        # در صورت تکمیل با تأخیر، بقیه نوبت‌ها به‌روزرسانی شوند
-        if new_status == "completed":
-            delay_minutes = 0
-            if appointment.actual_duration and appointment.actual_duration > appointment.predicted_duration:
-                delay_minutes = appointment.actual_duration - appointment.predicted_duration
-
-            if delay_minutes > 0:
-                later_appointments = Appointment.objects.filter(
-                    date=appointment.date,
-                    predicted_start_time__gt=appointment.predicted_start_time
-                ).order_by('predicted_start_time')
-
-                for a in later_appointments:
-                    dt = datetime.combine(appointment.date, a.predicted_start_time)
-                    dt += timedelta(minutes=delay_minutes)
-                    a.predicted_start_time = dt.time()
-                    a.save()
-
         return Response({"status": "updated"}, status=http_status.HTTP_200_OK)
+
+    def shift_later_appointments(self, appointment, shift_minutes):
+        later_appointments = Appointment.objects.filter(
+            date=appointment.date,
+            predicted_start_time__gt=appointment.predicted_start_time
+        ).order_by('predicted_start_time')
+
+        for a in later_appointments:
+            dt = datetime.combine(appointment.date, a.predicted_start_time)
+            dt += timedelta(minutes=shift_minutes)
+            a.predicted_start_time = dt.time()
+            a.save()
+
 
 class AppointmentAddTimeView(APIView):
     permission_classes = [IsAuthenticated]
@@ -168,3 +162,32 @@ class AppointmentAddTimeView(APIView):
             a.save()
 
         return Response({"status": "extra_time_added"}, status=http_status.HTTP_200_OK)
+
+
+class AppointmentSearchByDateView(APIView):
+    
+    def get(self, request):
+        date_str = request.query_params.get("date")
+        if not date_str:
+            return Response({"error": "پارامتر date الزامی است."}, status=400)
+
+        try:
+            date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except ValueError:
+            return Response({"error": "فرمت تاریخ معتبر نیست. از YYYY-MM-DD استفاده کنید."}, status=400)
+
+        appointments = Appointment.objects.filter(date=date).select_related('patient__user').order_by('id')
+        serializer = AppointmentOutputSerializer(appointments, many=True)
+        return Response(serializer.data)
+    
+class AppointmentDoctorNoteUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, pk):
+        appointment = get_object_or_404(Appointment, pk=pk)
+        serializer = AppointmentDoctorNoteUpdateSerializer(appointment, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"status": "doctor_note_updated"})
+        return Response(serializer.errors, status=400)
+ 
