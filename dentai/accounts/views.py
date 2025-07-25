@@ -71,3 +71,14 @@ class PatientSearchView(APIView):
         )
         serializer = PatientSearchSerializer(patients, many=True)
         return Response(serializer.data)
+class PhoneNumberExistsView(APIView):
+    def get(self, request):
+        phone = request.query_params.get('phone_number')
+        if not phone:
+            return Response({"error": "پارامتر phone_number الزامی است."}, status=400)
+        
+        exists = User.objects.filter(phone_number=phone).exists()
+        return Response({
+            "phone_number": phone,
+            "exists": exists
+        })
