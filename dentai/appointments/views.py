@@ -1,7 +1,7 @@
 # appointments/views.py
 
 from rest_framework import viewsets
-from rest_framework.views import APIView
+from rest_framework.views import APIView,status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Appointment
@@ -17,9 +17,12 @@ from fuzzywuzzy import process
 
 
 class AppointmentViewSet(viewsets.ModelViewSet):
-    queryset = Appointment.objects.all()
+    queryset = Appointment.objects.all().order_by("id")
     serializer_class = AppointmentSerializer
-
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"status": "deleted"}, status=status.HTTP_200_OK)
 
 # مدل ML و انکودر
 with open('ai/duration_predictor_model_v2.pkl', 'rb') as f:
@@ -136,7 +139,7 @@ class AppointmentStatusUpdateView(APIView):
         for a in later_appointments:
             dt = datetime.combine(appointment.date, a.predicted_start_time)
             dt += timedelta(minutes=shift_minutes)
-            a.predicted_start_time = dt.time()
+            a.predicted_start_time = dt.time().replace(microsecond=0)
             a.save()
 
 
@@ -158,7 +161,7 @@ class AppointmentAddTimeView(APIView):
         for a in later_appointments:
             dt = datetime.combine(appointment.date, a.predicted_start_time)
             dt += timedelta(minutes=extra)
-            a.predicted_start_time = dt.time()
+            a.predicted_start_time = dt.time() 
             a.save()
 
         return Response({"status": "extra_time_added"}, status=http_status.HTTP_200_OK)
@@ -179,6 +182,8 @@ class AppointmentSearchByDateView(APIView):
         appointments = Appointment.objects.filter(date=date).select_related('patient__user').order_by('id')
         serializer = AppointmentOutputSerializer(appointments, many=True)
         return Response(serializer.data)
+    
+
     
 class AppointmentDoctorNoteUpdateView(APIView):
     permission_classes = [IsAuthenticated]

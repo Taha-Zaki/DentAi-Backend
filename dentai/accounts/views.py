@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from .models import Patient, User
-from .serializers import PatientSerializer, UserSerializer, PatientSearchSerializer
+from .serializers import PatientSerializer, UserSerializer, PatientSearchSerializer,PatientMiniSerializer
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
@@ -27,7 +27,8 @@ class StaffLoginView(APIView):
             refresh = RefreshToken.for_user(user)
             return Response({
                 "token": str(refresh.access_token),
-                "role": "receptionist"
+                "role": "receptionist",
+                "isAuthenticated": True
             })
         return Response({"error": "اطلاعات ورود نامعتبر است."}, status=400)
 
@@ -82,3 +83,13 @@ class PhoneNumberExistsView(APIView):
             "phone_number": phone,
             "exists": exists
         })
+class PatientMiniDetailView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, patient_id):
+        try:
+            patient = Patient.objects.select_related("user").get(id=patient_id)
+            serializer = PatientMiniSerializer(patient)
+            return Response(serializer.data)
+        except Patient.DoesNotExist:
+            return Response({"error": "بیمار یافت نشد."}, status=404)
