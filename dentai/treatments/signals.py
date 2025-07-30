@@ -11,6 +11,7 @@ def sync_treatment_with_appointment(sender, instance, created, **kwargs):
         Treatment.objects.create(
             appointment=instance,
             treatment_type=instance.treatment_type,
+            predicted_start_time = instance.predicted_start_time,
             date=instance.date,
             status=instance.status,
             doctor_note=instance.doctor_note
@@ -20,6 +21,7 @@ def sync_treatment_with_appointment(sender, instance, created, **kwargs):
         try:
             treatment = Treatment.objects.get(appointment=instance)
             treatment.treatment_type = instance.treatment_type
+            treatment.predicted_start_time = instance.predicted_start_time
             treatment.date = instance.date
             treatment.status = instance.status
             treatment.doctor_note = instance.doctor_note
@@ -29,6 +31,7 @@ def sync_treatment_with_appointment(sender, instance, created, **kwargs):
             Treatment.objects.create(
                 appointment=instance,
                 treatment_type=instance.treatment_type,
+                predicted_start_time = instance.predicted_start_time,
                 date=instance.date,
                 status=instance.status,
                 doctor_note=instance.doctor_note

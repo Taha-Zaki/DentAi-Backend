@@ -84,6 +84,23 @@ class PatientSerializer(serializers.ModelSerializer):
         return instance
 
 
+class PatientMiniSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Patient
+        fields = ['id', 'user', 'birth_date', 'has_allergy']
+
+    def get_user(self, obj):
+        user = obj.user
+        return {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "phone_number": user.phone_number,
+            "national_id": user.national_id,
+        }
+
+
 # ------------------ Search ------------------
 class PatientSearchSerializer(serializers.ModelSerializer):
     full_name = serializers.SerializerMethodField()
