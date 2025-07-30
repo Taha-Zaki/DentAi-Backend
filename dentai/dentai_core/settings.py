@@ -18,6 +18,14 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+import os
+import dj_database_url
+
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+
+
+
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
@@ -34,25 +42,27 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
     ]
 }
+    
+
+
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-import os
-import dj_database_url
 
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+ALLOWED_HOSTS = ['*']  # یا دقیق‌تر: ['your-app-name.onrender.com']
 
-ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
 
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.environ.get('DATABASE_URL')
-    )
+    'default': dj_database_url.config(default='sqlite:///db.sqlite3', conn_max_age=600)
 }
+
 
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 # Application definition
@@ -86,6 +96,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+
+# Whitenoise configuration
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 CORS_ALLOW_ALL_ORIGINS = True
 
