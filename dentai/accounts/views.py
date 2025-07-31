@@ -8,7 +8,8 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
-
+from django.http import HttpResponse
+from django.contrib.auth.models import User
 
 
 # لیست و پروفایل بیماران
@@ -93,3 +94,25 @@ class PatientMiniDetailView(APIView):
             return Response(serializer.data)
         except Patient.DoesNotExist:
             return Response({"error": "بیمار یافت نشد."}, status=404)
+
+
+
+class CreateAdminUserView(APIView):
+    def post(self, request):
+        # برای امنیت، می‌تونی یه کلید ساده بگیری
+        key = request.data.get("key")
+        if key != "dsf54gd45sgd1gtrh4fg1b":
+            return Response({"error": "Unauthorized"}, status=403)
+
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+
+        if User.objects.filter(is_superuser=True).exists():
+            return Response({"error": "Superuser already exists."}, status=400)
+
+        user = User.objects.create_superuser(
+            username="Drmousavi",
+            password="456",
+            email="Drmousavi@gmail.com"
+        )
+        return Response({"message": "Admin user created successfully."})

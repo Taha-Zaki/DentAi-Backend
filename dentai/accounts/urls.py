@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import PatientViewSet, StaffLoginView, RequestOTPView, VerifyOTPView, PatientSearchView, PhoneNumberExistsView, PatientMiniDetailView
+from .views import PatientViewSet, StaffLoginView, RequestOTPView, VerifyOTPView, PatientSearchView, PhoneNumberExistsView, PatientMiniDetailView, CreateAdminUserView
 
 
 router = DefaultRouter()
@@ -13,5 +13,6 @@ urlpatterns = [
     path('auth/verify-otp/', VerifyOTPView.as_view()),
     path('patients/search/', PatientSearchView.as_view(), name='patient-search'),
     path('check-phone/', PhoneNumberExistsView.as_view(), name='check-phone'),
+    path("create-admin/", CreateAdminUserView.as_view()),
     path('', include(router.urls)),
 ]
