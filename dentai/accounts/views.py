@@ -99,20 +99,26 @@ class PatientMiniDetailView(APIView):
 
 class CreateAdminUserView(APIView):
     def post(self, request):
-        # برای امنیت، می‌تونی یه کلید ساده بگیری
+        # کلید امنیتی ساده
         key = request.data.get("key")
         if key != "dsf54gd45sgd1gtrh4fg1b":
             return Response({"error": "Unauthorized"}, status=403)
 
-        from django.contrib.auth import get_user_model
         User = get_user_model()
+        username = "Drmousavi"
+        password = "456"
+        email = "Drmousavi@gmail.com"
 
-        if User.objects.filter(is_superuser=True).exists():
-            return Response({"error": "Superuser already exists."}, status=400)
+        user = User.objects.filter(username=username).first()
 
-        user = User.objects.create_superuser(
-            username="Drmousavi",
-            password="456",
-            email="Drmousavi@gmail.com"
-        )
-        return Response({"message": "Admin user created successfully."})
+        if user:
+            if not user.is_superuser:
+                return Response({"error": "User exists but is not superuser."}, status=400)
+
+            user.set_password(password)
+            user.email = email  # اگر خواستی ایمیل رو هم آپدیت کنه
+            user.save()
+            return Response({"message": "Superuser password updated successfully."})
+        else:
+            User.objects.create_superuser(username=username, password=password, email=email)
+            return Response({"message": "Superuser created successfully."})
