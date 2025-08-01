@@ -72,7 +72,7 @@ class PatientSerializer(serializers.ModelSerializer):
         # ساخت username از first_name + last_name
         first_name = user_data.get("first_name", "").strip()
         last_name = user_data.get("last_name", "").strip()
-        base_username = f"{first_name}{last_name}".replace(" ", "").lower()
+        base_username = f"{first_name}_{last_name}".replace(" ", "").lower()
 
         # اطمینان از یکتا بودن username
         username = base_username
