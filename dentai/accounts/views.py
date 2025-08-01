@@ -20,6 +20,10 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all().select_related('user')
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"status": "deleted"}, status=status.HTTP_200_OK)
 
 # ورود منشی با username/password
 class StaffLoginView(APIView):
