@@ -3,6 +3,7 @@ from .models import User, Patient
 
 # ------------------ User ------------------
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
     class Meta:
         model  = User
         fields = ['id', 'username', 'first_name', 'last_name', 'phone_number', 'national_id']
