@@ -90,6 +90,20 @@ class PatientSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", None)
         if user_data:
+
+            first_name = user_data.get("first_name", instance.user.first_name).strip()
+            last_name = user_data.get("last_name", instance.user.last_name).strip()
+            base_username = f"{first_name}_{last_name}".replace(" ", "").lower()
+
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exclude(pk=instance.user.pk).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user_data["username"] = username
+
+
             for attr, val in user_data.items():
                 setattr(instance.user, attr, val)
             instance.user.save()
