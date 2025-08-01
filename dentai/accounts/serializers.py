@@ -67,8 +67,24 @@ class PatientSerializer(serializers.ModelSerializer):
     # ——> از default ModelSerializer.create/update استفاده می‌کنیم (flat data)
     def create(self, validated_data):
         user_data = validated_data.pop("user")
+
+        # ساخت username از first_name + last_name
+        first_name = user_data.get("first_name", "").strip()
+        last_name = user_data.get("last_name", "").strip()
+        base_username = f"{first_name}{last_name}".replace(" ", "").lower()
+
+        # اطمینان از یکتا بودن username
+        username = base_username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        user_data["username"] = username
+
         user = User.objects.create_user(**user_data, is_patient=True)
         return Patient.objects.create(user=user, **validated_data)
+
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", None)
