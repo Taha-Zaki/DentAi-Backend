@@ -65,7 +65,7 @@ class RequestOTPView(APIView):
         except User.DoesNotExist:
             return Response({"error": "کاربر یافت نشد."}, status=404)
 
-        otp_code =1234    # ''.join(random.choices(string.digits, k=4))
+        otp_code ='1234'   # ''.join(random.choices(string.digits, k=4))
 
         request.session['otp'] = otp_code
         request.session['phone'] = phone
