@@ -108,7 +108,9 @@ class VerifyOTPView(APIView):
                 "role": "patient",
                 "isAuthenticated": True
             })
-
+        print (code)
+        print (phone)
+        
         return Response({"error": "کد اشتباه است یا منقضی شده."}, status=400)
     
     
