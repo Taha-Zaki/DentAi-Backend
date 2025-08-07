@@ -65,26 +65,26 @@ class RequestOTPView(APIView):
         except User.DoesNotExist:
             return Response({"error": "کاربر یافت نشد."}, status=404)
 
-        otp_code = ''.join(random.choices(string.digits, k=4))
+        otp_code =1234    # ''.join(random.choices(string.digits, k=4))
 
         request.session['otp'] = otp_code
         request.session['phone'] = phone
         request.session.set_expiry(300)  # تنظیم زمان اعتبار کد به ۵ دقیقه
         print("کد OTP:", otp_code)
 
-        try:
-            api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
-            params = {
-                'sender' : '2000660110',
-                'receptor': phone,
-                'token': otp_code,
-                'template': 'OTP',
-                'type': 'sms'  # یا voice برای تماس صوتی
-            }
-            api.verify_lookup(params)
-        except (APIException, HTTPException) as e:
-            print("SMS Error:", str(e))
-            return Response({"error": "خطا در ارسال پیامک"}, status=500)
+        # try:
+        #     api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
+        #     params = {
+        #         'sender' : '2000660110',
+        #         'receptor': phone,
+        #         'token': otp_code,
+        #         'template': 'OTP',
+        #         'type': 'sms'  # یا voice برای تماس صوتی
+        #     }
+        #     api.verify_lookup(params)
+        # except (APIException, HTTPException) as e:
+        #     print("SMS Error:", str(e))
+        #     return Response({"error": "خطا در ارسال پیامک"}, status=500)
 
         return Response({"message": "کد با موفقیت ارسال شد."})
 
