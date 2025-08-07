@@ -110,7 +110,8 @@ class VerifyOTPView(APIView):
             })
         print (code)
         print (phone)
-        
+        print("DATA:", request.data)
+
         return Response({"error": "کد اشتباه است یا منقضی شده."}, status=400)
     
     
