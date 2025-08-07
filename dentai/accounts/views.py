@@ -12,6 +12,9 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 User = get_user_model()  # ✅ درست
 
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
@@ -87,7 +90,8 @@ class RequestOTPView(APIView):
         #     return Response({"error": "خطا در ارسال پیامک"}, status=500)
 
         return Response({"message": "کد با موفقیت ارسال شد."})
-
+    
+@method_decorator(csrf_exempt, name='dispatch')
 class VerifyOTPView(APIView):
     def post(self, request):
         phone = request.data.get('phone_number')
