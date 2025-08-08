@@ -23,6 +23,7 @@ import dj_database_url
 
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+KAVENEGAR_API_KEY = '6D35427853414379573051315872337A67425952582B32777971446D6134793841477470774F74555A62733D'
 
 
 
@@ -85,6 +86,11 @@ INSTALLED_APPS = [
     'django_extensions',
 
 ]
+
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

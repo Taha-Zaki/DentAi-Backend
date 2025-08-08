@@ -3,6 +3,7 @@ from .models import User, Patient
 
 # ------------------ User ------------------
 class UserSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(read_only=True)
     class Meta:
         model  = User
         fields = ['id', 'username', 'first_name', 'last_name', 'phone_number', 'national_id']
@@ -67,12 +68,42 @@ class PatientSerializer(serializers.ModelSerializer):
     # ——> از default ModelSerializer.create/update استفاده می‌کنیم (flat data)
     def create(self, validated_data):
         user_data = validated_data.pop("user")
+
+        # ساخت username از first_name + last_name
+        first_name = user_data.get("first_name", "").strip()
+        last_name = user_data.get("last_name", "").strip()
+        base_username = f"{first_name}_{last_name}".replace(" ", "").lower()
+
+        # اطمینان از یکتا بودن username
+        username = base_username
+        counter = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{counter}"
+            counter += 1
+
+        user_data["username"] = username
+
         user = User.objects.create_user(**user_data, is_patient=True)
         return Patient.objects.create(user=user, **validated_data)
+
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop("user", None)
         if user_data:
+
+            first_name = user_data.get("first_name", instance.user.first_name).strip()
+            last_name = user_data.get("last_name", instance.user.last_name).strip()
+            base_username = f"{first_name}_{last_name}".replace(" ", "").lower()
+
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exclude(pk=instance.user.pk).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+
+            user_data["username"] = username
+
+
             for attr, val in user_data.items():
                 setattr(instance.user, attr, val)
             instance.user.save()

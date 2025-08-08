@@ -9,7 +9,19 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from django.http import HttpResponse
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
+User = get_user_model()  # ✅ درست
+
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from django.contrib.auth import get_user_model
+
+import random, string
+from kavenegar import KavenegarAPI, APIException, HTTPException
+from django.conf import settings
 
 
 # لیست و پروفایل بیماران
@@ -17,6 +29,16 @@ class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all().select_related('user')
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response({"status": "deleted"}, status=status.HTTP_200_OK)
+
+    def perform_destroy(self, instance):
+        user = instance.user
+        instance.delete()
+        user.delete()
 
 # ورود منشی با username/password
 class StaffLoginView(APIView):
@@ -33,33 +55,71 @@ class StaffLoginView(APIView):
             })
         return Response({"error": "اطلاعات ورود نامعتبر است."}, status=400)
 
-# ورود بیمار با شماره موبایل و OTP (شبیه‌سازی‌شده)
+
+
 class RequestOTPView(APIView):
     def post(self, request):
         phone = request.data.get('phone_number')
+        if not phone:
+            return Response({"error": "شماره موبایل وارد نشده."}, status=400)
+
         try:
             user = User.objects.get(phone_number=phone, is_patient=True)
-            # اینجا به‌صورت واقعی باید کد ارسال شود
-            request.session['otp'] = '1234'
-            request.session['phone'] = phone
-            return Response({"message": "کد ارسال شد."})
         except User.DoesNotExist:
             return Response({"error": "کاربر یافت نشد."}, status=404)
 
+        otp_code ='1234'   # ''.join(random.choices(string.digits, k=4))
+
+        request.session['otp'] = otp_code
+        request.session['phone'] = phone
+        request.session.set_expiry(300)  # تنظیم زمان اعتبار کد به ۵ دقیقه
+        print("کد OTP:", otp_code)
+
+        # try:
+        #     api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
+        #     params = {
+        #         'sender' : '2000660110',
+        #         'receptor': phone,
+        #         'token': otp_code,
+        #         'template': 'OTP',
+        #         'type': 'sms'  # یا voice برای تماس صوتی
+        #     }
+        #     api.verify_lookup(params)
+        # except (APIException, HTTPException) as e:
+        #     print("SMS Error:", str(e))
+        #     return Response({"error": "خطا در ارسال پیامک"}, status=500)
+
+        return Response({"message": "کد با موفقیت ارسال شد."})
+    
+@method_decorator(csrf_exempt, name='dispatch')
 class VerifyOTPView(APIView):
     def post(self, request):
         phone = request.data.get('phone_number')
         code = request.data.get('code')
+
+        if not code or not phone:
+            return Response({"error": "شماره موبایل یا کد وارد نشده."}, status=400)
+
         if code == request.session.get('otp') and phone == request.session.get('phone'):
-            user = User.objects.get(phone_number=phone)
+            try:
+                user = User.objects.get(phone_number=phone, is_patient=True)
+            except User.DoesNotExist:
+                return Response({"error": "کاربر یافت نشد."}, status=404)
+
             refresh = RefreshToken.for_user(user)
             return Response({
                 "token": str(refresh.access_token),
-                "role": "patient"
+                "role": "patient",
+                "isAuthenticated": True
             })
-        return Response({"error": "کد اشتباه است."}, status=400)
+        print (code)
+        print (phone)
+        print("DATA:", request.data)
+        print("Headers:", request.headers)
 
-
+        return Response({"error": "کد اشتباه است یا منقضی شده."}, status=400)
+    
+    
 class PatientSearchView(APIView):
     permission_classes = [IsAuthenticated]
 
