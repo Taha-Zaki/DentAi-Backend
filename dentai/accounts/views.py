@@ -57,6 +57,10 @@ class StaffLoginView(APIView):
 
 
 
+from .models import OTP
+from django.utils import timezone
+import random
+
 class RequestOTPView(APIView):
     def post(self, request):
         phone = request.data.get('phone_number')
@@ -68,30 +72,32 @@ class RequestOTPView(APIView):
         except User.DoesNotExist:
             return Response({"error": "کاربر یافت نشد."}, status=404)
 
-        otp_code ='1234'   # ''.join(random.choices(string.digits, k=4))
+        otp_code =''.join(random.choices(string.digits, k=4))
+        print(otp_code)
 
-        request.session['otp'] = otp_code
-        request.session['phone'] = phone
-        request.session.set_expiry(300)  # تنظیم زمان اعتبار کد به ۵ دقیقه
-        print("کد OTP:", otp_code)
+        # حذف کدهای قدیمی برای این شماره
+        OTP.objects.filter(phone_number=phone).delete()
 
-        # try:
-        #     api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
-        #     params = {
-        #         'sender' : '2000660110',
-        #         'receptor': phone,
-        #         'token': otp_code,
-        #         'template': 'OTP',
-        #         'type': 'sms'  # یا voice برای تماس صوتی
-        #     }
-        #     api.verify_lookup(params)
-        # except (APIException, HTTPException) as e:
-        #     print("SMS Error:", str(e))
-        #     return Response({"error": "خطا در ارسال پیامک"}, status=500)
+        # ذخیره کد جدید
+        OTP.objects.create(phone_number=phone, code=otp_code)
+
+
+        try:
+            api = KavenegarAPI(settings.KAVENEGAR_API_KEY)
+            params = {
+                'sender' : '2000660110',
+                'receptor': phone,
+                'token': otp_code,
+                'template': 'OTP',
+                'type': 'sms'  # یا voice برای تماس صوتی
+            }
+            api.verify_lookup(params)
+        except (APIException, HTTPException) as e:
+            print("SMS Error:", str(e))
+            return Response({"error": "خطا در ارسال پیامک"}, status=500)
 
         return Response({"message": "کد با موفقیت ارسال شد."})
     
-@method_decorator(csrf_exempt, name='dispatch')
 class VerifyOTPView(APIView):
     def post(self, request):
         phone = request.data.get('phone_number')
@@ -100,28 +106,32 @@ class VerifyOTPView(APIView):
         if not code or not phone:
             return Response({"error": "شماره موبایل یا کد وارد نشده."}, status=400)
 
-        if code == request.session.get('otp') and phone == request.session.get('phone'):
-            try:
-                user = User.objects.get(phone_number=phone, is_patient=True)
-            except User.DoesNotExist:
-                return Response({"error": "کاربر یافت نشد."}, status=404)
+        try:
+            otp_record = OTP.objects.get(phone_number=phone, code=code)
+        except OTP.DoesNotExist:
+            return Response({"error": "کد اشتباه است یا منقضی شده."}, status=400)
 
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                "token": str(refresh.access_token),
-                "role": "patient",
-                "isAuthenticated": True
-            })
-        print (code)
-        print (phone)
-        print("DATA:", request.data)
-        print("Headers:", request.headers)
+        if otp_record.is_expired():
+            otp_record.delete()
+            return Response({"error": "کد اشتباه است یا منقضی شده."}, status=400)
 
-        return Response({"error": "کد اشتباه است یا منقضی شده."}, status=400)
-    
+        # اگر کد درست و معتبر است، کد رو حذف می‌کنیم تا یکبار مصرف باشد
+        otp_record.delete()
+
+        try:
+            user = User.objects.get(phone_number=phone, is_patient=True)
+        except User.DoesNotExist:
+            return Response({"error": "کاربر یافت نشد."}, status=404)
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "token": str(refresh.access_token),
+            "role": "patient",
+            "isAuthenticated": True
+        })
+
     
 class PatientSearchView(APIView):
-    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         query = request.query_params.get('query', '')

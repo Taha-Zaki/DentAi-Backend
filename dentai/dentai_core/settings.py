@@ -13,17 +13,20 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import os
 from datetime import timedelta
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(os.path.join(BASE_DIR.parent, '.env'))
 
 
 import os
 import dj_database_url
 
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY', 'dev-secret-change-this')
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
 
-KAVENEGAR_API_KEY = '6D35427853414379573051315872337A67425952582B32777971446D6134793841477470774F74555A62733D'
+KAVENEGAR_API_KEY = os.getenv('KAVENEGAR_API_KEY')
 
 
 
@@ -31,7 +34,6 @@ KAVENEGAR_API_KEY = '6D35427853414379573051315872337A67425952582B32777971446D613
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-7y+$$_fqq1lr!scc5qg98*mjiw4=-kaa)4kl4acangd1h5p(dv'
 
 SIMPLE_JWT= {'ACCESS_TOKEN_LIFETIME':timedelta(days=365*100),'REFRESH_TOKEN_LIFETIME':timedelta(days=365*100),}
 
@@ -52,16 +54,23 @@ REST_FRAMEWORK = {
 
 
 
-ALLOWED_HOSTS = ['*']  # یا دقیق‌تر: ['your-app-name.onrender.com']
-
+ALLOWED_HOSTS = ['*']  
 
 DATABASES = {
-    'default': dj_database_url.config(default='sqlite:///db.sqlite3', conn_max_age=600)
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST', 'db'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
+    }
 }
 
 
+
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = os.getenv('STATIC_ROOT', '/vol/static')
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
@@ -90,6 +99,10 @@ INSTALLED_APPS = [
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
+CSRF_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
 
 
 MIDDLEWARE = [
@@ -107,9 +120,10 @@ MIDDLEWARE = [
 # Whitenoise configuration
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
-CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'dentai_core.urls'
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 TEMPLATES = [
     {
@@ -169,7 +183,7 @@ USE_I18N = True
 USE_TZ = False
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.getenv('MEDIA_ROOT', '/vol/media')
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
