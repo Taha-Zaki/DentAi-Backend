@@ -54,7 +54,7 @@ class BatchAppointmentInputSerializer(serializers.Serializer):
     )
 
 class AppointmentOutputSerializer(serializers.ModelSerializer):
-    patient_name = serializers.CharField(source='patient.user.username', read_only=True)
+    
     predicted_start_time = serializers.TimeField(format='%H:%M:%S')
     actual_start_time = serializers.TimeField(format='%H:%M:%S', required=False)
     
