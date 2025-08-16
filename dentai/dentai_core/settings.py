@@ -54,7 +54,9 @@ REST_FRAMEWORK = {
 
 
 
-ALLOWED_HOSTS = ['*']  
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '*').split(',')
+
+CSRF_TRUSTED_ORIGINS = os.getenv('CSRF_TRUSTED_ORIGINS', '').split(',') if not DEBUG else []
 
 DATABASES = {
     'default': {
@@ -123,7 +125,10 @@ MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'dentai_core.urls'
 
-CORS_ALLOW_ALL_ORIGINS = True
+# CORS
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # در حالت تولید False می‌شود
+CORS_ALLOWED_ORIGINS = [o for o in os.getenv('CORS_ALLOWED_ORIGINS', '').split(',') if o]
+
 
 TEMPLATES = [
     {

@@ -169,7 +169,6 @@ class PatientMiniDetailView(APIView):
 
 class CreateAdminUserView(APIView):
     def post(self, request):
-        # کلید امنیتی ساده
         key = request.data.get("key")
         if key != "dsf54gd45sgd1gtrh4fg1b":
             return Response({"error": "Unauthorized"}, status=403)
@@ -186,9 +185,13 @@ class CreateAdminUserView(APIView):
                 return Response({"error": "User exists but is not superuser."}, status=400)
 
             user.set_password(password)
-            user.email = email  # اگر خواستی ایمیل رو هم آپدیت کنه
+            user.email = email
+            user.is_receptionist = True  # تنظیم نقش منشی
             user.save()
-            return Response({"message": "Superuser password updated successfully."})
+            return Response({"message": "Superuser updated with receptionist role."})
         else:
-            User.objects.create_superuser(username=username, password=password, email=email)
-            return Response({"message": "Superuser created successfully."})
+            user = User.objects.create_superuser(username=username, password=password, email=email)
+            user.is_receptionist = True  # تنظیم نقش منشی هنگام ساخت
+            user.save()
+            return Response({"message": "Superuser with receptionist role created successfully."})
+
