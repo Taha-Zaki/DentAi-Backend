@@ -69,8 +69,8 @@ class AppointmentOutputSerializer(serializers.ModelSerializer):
 
     def get_patient_name(self, obj):
         user=obj.patient.user
-	full_name = f"{user.first_name} {user.last_name}".strip()
-	return full_name if full_name else user.username
+        full_name = f"{user.first_name} {user.last_name}".strip()
+        return full_name if full_name else user.username
 
     class AppointmentStatusUpdateSerializer(serializers.ModelSerializer):
         class Meta:
