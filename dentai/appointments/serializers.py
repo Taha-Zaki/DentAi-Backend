@@ -54,7 +54,7 @@ class BatchAppointmentInputSerializer(serializers.Serializer):
     )
 
 class AppointmentOutputSerializer(serializers.ModelSerializer):
-    patient_name = serializers.CharField(source='patient.user.username', read_only=True)
+    patient_name = serializers.SerializerMethodField()
     predicted_start_time = serializers.TimeField(format='%H:%M:%S')
     actual_start_time = serializers.TimeField(format='%H:%M:%S', required=False)
     
@@ -68,7 +68,9 @@ class AppointmentOutputSerializer(serializers.ModelSerializer):
         ]
 
     def get_patient_name(self, obj):
-        return obj.patient.user.first_name
+        user=obj.patient.user
+	full_name = f"{user.first_name} {user.last_name}".strip()
+	return full_name if full_name else user.username 
     
     class AppointmentStatusUpdateSerializer(serializers.ModelSerializer):
         class Meta:
